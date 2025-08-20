@@ -35,11 +35,31 @@ CREATE TABLE character_starships (
     PRIMARY KEY (character_id, starship_id)
 );
 
+-- Character kills junction table
+CREATE TABLE character_kills (
+    id SERIAL PRIMARY KEY,
+    killer_id INTEGER REFERENCES characters(id) ON DELETE CASCADE,
+    victim_id INTEGER REFERENCES characters(id) ON DELETE CASCADE,
+    method VARCHAR(255),
+    location VARCHAR(255),
+    description TEXT,
+    occurred_at TIMESTAMP DEFAULT NOW(),
+    
+    -- Prevent self-kills
+    CONSTRAINT no_suicide CHECK (killer_id != victim_id),
+    
+    -- Prevent duplicate kills (same victim can't be killed twice)
+    UNIQUE(victim_id)
+);
+
 
 -- Indexes for better query performance
 CREATE INDEX idx_characters_homeworld ON characters(homeworld_id);
 CREATE INDEX idx_character_starships_character ON character_starships(character_id);
 CREATE INDEX idx_character_starships_starship ON character_starships(starship_id);
+CREATE INDEX idx_kills_killer ON character_kills(killer_id);
+CREATE INDEX idx_kills_victim ON character_kills(victim_id);
+CREATE INDEX idx_kills_occurred_at ON character_kills(occurred_at);
 
 -- Insert initial data
 -- Planets
