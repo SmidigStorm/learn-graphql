@@ -43,26 +43,11 @@ const resolvers = {
       return result.rows;
     },
     
-    // Film queries
-    film: async (_, { id }) => {
-      const result = await db.query('SELECT *, episode_id as "episodeId" FROM films WHERE id = $1', [id]);
-      return result.rows[0];
-    },
-    
-    films: async () => {
-      const result = await db.query('SELECT *, episode_id as "episodeId" FROM films ORDER BY id');
-      return result.rows;
-    },
-    
-    filmsByEpisode: async () => {
-      const result = await db.query('SELECT *, episode_id as "episodeId" FROM films ORDER BY episode_id');
-      return result.rows;
-    },
   },
   
   Mutation: {
     addCharacter: async (_, { input }) => {
-      const { name, height, mass, homeworldId, starshipIds, filmIds } = input;
+      const { name, height, mass, homeworldId, starshipIds } = input;
       
       // Start a transaction
       const client = await db.pool.connect();
@@ -87,15 +72,6 @@ const resolvers = {
           }
         }
         
-        // Insert film relationships
-        if (filmIds && filmIds.length > 0) {
-          for (const filmId of filmIds) {
-            await client.query(
-              'INSERT INTO character_films (character_id, film_id) VALUES ($1, $2)',
-              [character.id, filmId]
-            );
-          }
-        }
         
         await client.query('COMMIT');
         return character;
@@ -158,16 +134,6 @@ const resolvers = {
       return result.rows;
     },
     
-    films: async (character) => {
-      const result = await db.query(
-        `SELECT f.*, f.episode_id as "episodeId" FROM films f
-         JOIN character_films cf ON f.id = cf.film_id
-         WHERE cf.character_id = $1
-         ORDER BY f.episode_id`,
-        [character.id]
-      );
-      return result.rows;
-    }
   },
   
   Planet: {
@@ -193,18 +159,6 @@ const resolvers = {
     }
   },
   
-  Film: {
-    characters: async (film) => {
-      const result = await db.query(
-        `SELECT c.* FROM characters c
-         JOIN character_films cf ON c.id = cf.character_id
-         WHERE cf.film_id = $1
-         ORDER BY c.name`,
-        [film.id]
-      );
-      return result.rows;
-    }
-  }
 };
 
 module.exports = resolvers;

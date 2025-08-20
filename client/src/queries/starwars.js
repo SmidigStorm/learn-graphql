@@ -40,12 +40,6 @@ export const GET_CHARACTER = gql`
         model
         manufacturer
       }
-      films {
-        id
-        title
-        episodeId
-        director
-      }
     }
   }
 `;
@@ -100,22 +94,6 @@ export const GET_STARSHIPS = gql`
   }
 `;
 
-// Query to get films sorted by episode
-export const GET_FILMS_BY_EPISODE = gql`
-  query GetFilmsByEpisode {
-    filmsByEpisode {
-      id
-      title
-      episodeId
-      releaseDate
-      director
-      characters {
-        id
-        name
-      }
-    }
-  }
-`;
 
 // Mutation to add a new character
 export const ADD_CHARACTER = gql`

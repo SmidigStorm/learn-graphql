@@ -8,7 +8,6 @@ const typeDefs = gql`
     mass: Int
     homeworld: Planet
     starships: [Starship!]!
-    films: [Film!]!
   }
 
   type Planet {
@@ -31,14 +30,6 @@ const typeDefs = gql`
     pilots: [Character!]!
   }
 
-  type Film {
-    id: ID!
-    title: String!
-    episodeId: Int!
-    releaseDate: String
-    director: String
-    characters: [Character!]!
-  }
 
   type Query {
     # Character queries
@@ -54,10 +45,6 @@ const typeDefs = gql`
     starship(id: ID!): Starship
     starships: [Starship!]!
     
-    # Film queries
-    film(id: ID!): Film
-    films: [Film!]!
-    filmsByEpisode: [Film!]!
   }
 
   type Mutation {
@@ -77,7 +64,6 @@ const typeDefs = gql`
     mass: Int
     homeworldId: ID
     starshipIds: [ID!]
-    filmIds: [ID!]
   }
 `;
 
