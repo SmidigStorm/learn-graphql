@@ -1,0 +1,111 @@
+
+> server@1.0.0 start:db
+> node index-db.js
+
+🚀 Server ready at http://localhost:4000/
+🎮 GraphQL Playground available at http://localhost:4000/
+
+📝 Try these example queries in the playground:
+
+1. Get all characters with their relationships:
+
+query {
+  characters {
+    id
+    name
+    height
+    homeworld {
+      name
+      population
+    }
+    starships {
+      name
+      model
+    }
+    films {
+      title
+      episode_id
+    }
+  }
+}
+  
+
+2. Search for a character:
+
+query {
+  searchCharacters(name: "Luke") {
+    name
+    homeworld {
+      name
+      residents {
+        name
+      }
+    }
+  }
+}
+  
+
+3. Add a new character:
+
+mutation {
+  addCharacter(input: {
+    name: "Rey"
+    height: 170
+    homeworldId: 1
+    starshipIds: [1]
+    filmIds: [4]
+  }) {
+    id
+    name
+    homeworld {
+      name
+    }
+  }
+}
+  
+Connected to PostgreSQL database
+Connected to PostgreSQL database
+Connected to PostgreSQL database
+Connected to PostgreSQL database
+Connected to PostgreSQL database
+Connected to PostgreSQL database
+Connected to PostgreSQL database
+Connected to PostgreSQL database
+Connected to PostgreSQL database
+Connected to PostgreSQL database
+Connected to PostgreSQL database
+Connected to PostgreSQL database
+Connected to PostgreSQL database
+Connected to PostgreSQL database
+Connected to PostgreSQL database
+Connected to PostgreSQL database
+Connected to PostgreSQL database
+Connected to PostgreSQL database
+Connected to PostgreSQL database
+Connected to PostgreSQL database
+Connected to PostgreSQL database
+Connected to PostgreSQL database
+Connected to PostgreSQL database
+Connected to PostgreSQL database
+Connected to PostgreSQL database
+Connected to PostgreSQL database
+Connected to PostgreSQL database
+Connected to PostgreSQL database
+Connected to PostgreSQL database
+Connected to PostgreSQL database
+Connected to PostgreSQL database
+Connected to PostgreSQL database
+Connected to PostgreSQL database
+Connected to PostgreSQL database
+Connected to PostgreSQL database
+Connected to PostgreSQL database
+Connected to PostgreSQL database
+Connected to PostgreSQL database
+Connected to PostgreSQL database
+Connected to PostgreSQL database
+Connected to PostgreSQL database
+Connected to PostgreSQL database
+Connected to PostgreSQL database
+Connected to PostgreSQL database
+Connected to PostgreSQL database
+Connected to PostgreSQL database

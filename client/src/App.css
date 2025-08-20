@@ -1,0 +1,323 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: #0a0a0a;
+  color: #ffffff;
+}
+
+.App {
+  min-height: 100vh;
+}
+
+.App-header {
+  background-color: #1a1a1a;
+  padding: 2rem;
+  text-align: center;
+  border-bottom: 2px solid #ffd700;
+}
+
+.App-header h1 {
+  margin: 0;
+  font-size: 2.5rem;
+  color: #ffd700;
+}
+
+.App-header p {
+  margin: 0.5rem 0 0;
+  color: #888;
+}
+
+/* Tab Navigation */
+.tab-nav {
+  display: flex;
+  justify-content: center;
+  background-color: #1a1a1a;
+  padding: 0;
+  gap: 1px;
+}
+
+.tab-nav button {
+  background-color: #2a2a2a;
+  color: #888;
+  border: none;
+  padding: 1rem 2rem;
+  cursor: pointer;
+  transition: all 0.3s;
+  font-size: 1rem;
+}
+
+.tab-nav button:hover {
+  background-color: #3a3a3a;
+  color: #fff;
+}
+
+.tab-nav button.active {
+  background-color: #0a0a0a;
+  color: #ffd700;
+  border-bottom: 2px solid #ffd700;
+}
+
+/* Main Content */
+.main-content {
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Loading and Error States */
+.loading, .error {
+  text-align: center;
+  padding: 2rem;
+  font-size: 1.2rem;
+}
+
+.error {
+  color: #ff4444;
+}
+
+/* Character List Styles */
+.character-list h2,
+.planet-explorer h2,
+.starship-database h2,
+.film-timeline h2 {
+  color: #ffd700;
+  margin-bottom: 1.5rem;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.header button {
+  background-color: #ffd700;
+  color: #000;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.add-form {
+  background-color: #1a1a1a;
+  padding: 1.5rem;
+  border-radius: 8px;
+  margin-bottom: 2rem;
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.add-form input,
+.add-form select {
+  background-color: #2a2a2a;
+  color: #fff;
+  border: 1px solid #444;
+  padding: 0.5rem;
+  border-radius: 4px;
+  flex: 1;
+  min-width: 150px;
+}
+
+.add-form button {
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  padding: 0.5rem 1.5rem;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+/* Cards Grid */
+.cards,
+.planet-grid,
+.starship-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
+.character-card,
+.planet-card,
+.starship-card,
+.film-entry {
+  background-color: #1a1a1a;
+  border: 1px solid #333;
+  border-radius: 8px;
+  padding: 1.5rem;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.character-card:hover,
+.planet-card:hover,
+.starship-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(255, 215, 0, 0.2);
+}
+
+.character-card h3,
+.planet-card h3,
+.starship-card h3,
+.film-entry h3 {
+  color: #ffd700;
+  margin-top: 0;
+}
+
+.starships ul,
+.residents ul,
+.pilots-section ul {
+  list-style: none;
+  padding-left: 0;
+  margin: 0.5rem 0 0;
+}
+
+.starships li,
+.residents li,
+.pilots-section li {
+  padding: 0.25rem 0;
+  color: #ccc;
+}
+
+/* Planet Explorer Specific */
+.planet-info p {
+  margin: 0.5rem 0;
+}
+
+.population {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.edit-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+  padding: 0.25rem;
+}
+
+/* Starship Database Specific */
+.ship-specs p {
+  margin: 0.25rem 0;
+  color: #aaa;
+}
+
+.pilots-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 1rem;
+}
+
+.add-pilot-btn {
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  padding: 0.25rem 0.75rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.875rem;
+}
+
+.no-pilots {
+  color: #666;
+  font-style: italic;
+  margin: 0.5rem 0 0;
+}
+
+.pilot-selector {
+  margin-top: 1rem;
+  display: flex;
+  gap: 0.5rem;
+}
+
+.pilot-selector select {
+  flex: 1;
+  background-color: #2a2a2a;
+  color: #fff;
+  border: 1px solid #444;
+  padding: 0.5rem;
+  border-radius: 4px;
+}
+
+.pilot-selector button {
+  background-color: #f44336;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+/* Film Timeline Specific */
+.timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.film-entry {
+  display: flex;
+  gap: 2rem;
+  align-items: flex-start;
+}
+
+.episode-marker {
+  background-color: #ffd700;
+  color: #000;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  font-weight: bold;
+  white-space: nowrap;
+}
+
+.film-details {
+  flex: 1;
+}
+
+.character-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.character-chip {
+  background-color: #2a2a2a;
+  padding: 0.25rem 0.75rem;
+  border-radius: 16px;
+  font-size: 0.875rem;
+  color: #ccc;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .tab-nav {
+    flex-wrap: wrap;
+  }
+  
+  .tab-nav button {
+    flex: 1 0 50%;
+  }
+  
+  .film-entry {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .add-form {
+    flex-direction: column;
+  }
+}
