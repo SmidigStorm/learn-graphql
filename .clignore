@@ -1,0 +1,23 @@
+# Exclude large directories to prevent V8 memory crashes
+node_modules/
+dist/
+build/
+.next/
+coverage/
+*.log
+*.log.*
+.git/
+.vscode/
+.idea/
+tmp/
+temp/
+cache/
+.cache/
+vendor/
+bower_components/
+jspm_packages/
+*.min.js
+*.min.css
+package-lock.json
+yarn.lock
+pnpm-lock.yaml

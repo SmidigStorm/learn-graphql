@@ -101,3 +101,25 @@ The server startup logs show example queries. Key operations:
 - No authentication/authorization implemented (learning project)
 - Database resets on volume removal (data not persistent)
 - All IDs in database are integers, not strings
+
+## V8 Memory Optimization
+To prevent V8 JavaScript engine crashes and memory issues:
+
+### File Operations
+- **Avoid large files**: Don't read files >10MB directly
+- **Use .clignore**: Project includes .clignore to exclude node_modules and other large directories
+- **Target specific paths**: Use precise file paths instead of broad directory searches
+
+### Memory Management
+- **Clear context regularly**: Use `/clear` command to free memory in long sessions
+- **Restart for long tasks**: Restart Claude Code before major refactoring operations
+- **Break up large tasks**: Split complex operations into smaller chunks
+
+### Known Large Directories
+- `client/node_modules`: ~443MB (excluded via .clignore)
+- `server/node_modules`: ~31MB (excluded via .clignore)
+
+### If Crashes Occur
+- Save work frequently using git commits
+- Report persistent issues at: https://github.com/anthropics/claude-code/issues
+- Consider increasing Node memory if configurable: `NODE_OPTIONS="--max-old-space-size=4096"`
