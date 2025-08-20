@@ -2,6 +2,25 @@
 
 A hands-on project to learn GraphQL fundamentals using the Star Wars universe as a fun, relatable data model.
 
+## Quick Start
+
+The easiest way to start the entire application:
+
+```bash
+./start.sh
+```
+
+This will:
+1. Start PostgreSQL database in Docker
+2. Install dependencies for both server and client
+3. Start the GraphQL server (http://localhost:4000)
+4. Start the React client (http://localhost:3000)
+
+To stop everything:
+```bash
+./stop.sh
+```
+
 ## What You'll Learn
 
 - **GraphQL Schema Design**: Types, queries, mutations, and relationships
@@ -19,7 +38,7 @@ learn-graphql/
 │   ├── index.js     # Apollo Server setup
 │   ├── schema.js    # GraphQL type definitions
 │   ├── resolvers.js # Query/mutation logic
-│   └── data.js      # Sample Star Wars data
+│   └── db/          # Database connection and setup
 └── client/          # Frontend React app
     ├── src/
     │   ├── apollo-client.js    # Apollo Client setup
@@ -28,27 +47,25 @@ learn-graphql/
     └── package.json
 ```
 
-## Getting Started
+## Manual Setup
 
-You can run this project in two modes:
+If you prefer to start components individually:
 
-### Option A: With PostgreSQL Database (Recommended)
-
-#### 1. Start PostgreSQL
+### 1. Start PostgreSQL
 ```bash
 docker compose up -d
 ```
 
-#### 2. Start the GraphQL Server with Database
+### 2. Start the GraphQL Server
 ```bash
 cd server
 npm install
-npm run start:db
+npm start
 ```
 
 The server will start at http://localhost:4000 with GraphQL Playground.
 
-#### 3. Start the React Client
+### 3. Start the React Client
 In a new terminal:
 ```bash
 cd client
@@ -57,18 +74,6 @@ npm start
 ```
 
 The React app will open at http://localhost:3000
-
-### Option B: In-Memory Data (Simple)
-
-#### 1. Start the GraphQL Server
-```bash
-cd server
-npm install
-npm start
-```
-
-#### 2. Start the React Client
-Same as above.
 
 ## Try These Exercises
 
@@ -172,7 +177,7 @@ Try these challenges:
 The schema (`schema.js`) defines the structure of your API before implementation.
 
 ### Resolvers
-Resolvers (`resolvers.js` or `resolvers-db.js`) contain the logic for fetching and manipulating data.
+Resolvers (`resolvers.js`) contain the logic for fetching and manipulating data from the PostgreSQL database.
 
 ### Relationships
 See how Characters, Planets, Starships, and Films are connected through field resolvers.
@@ -195,7 +200,7 @@ The database version demonstrates how GraphQL translates database relationships:
 1. Add subscriptions for real-time updates
 2. Implement pagination for large datasets
 3. Add authentication and authorization
-4. Connect to a real database instead of in-memory data
+4. Add more complex database relationships and queries
 5. Explore GraphQL directives and custom scalars
 
 ## Resources

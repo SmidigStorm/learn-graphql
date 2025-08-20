@@ -1,98 +1,208 @@
-const { characters, planets, starships, films } = require('./data');
+const db = require('./db/connection');
 
 const resolvers = {
   Query: {
     // Character queries
-    character: (_, { id }) => characters.find(c => c.id === id),
-    characters: () => characters,
-    searchCharacters: (_, { name }) => 
-      characters.filter(c => c.name.toLowerCase().includes(name.toLowerCase())),
+    character: async (_, { id }) => {
+      const result = await db.query('SELECT * FROM characters WHERE id = $1', [id]);
+      return result.rows[0];
+    },
+    
+    characters: async () => {
+      const result = await db.query('SELECT * FROM characters ORDER BY id');
+      return result.rows;
+    },
+    
+    searchCharacters: async (_, { name }) => {
+      const result = await db.query(
+        'SELECT * FROM characters WHERE LOWER(name) LIKE LOWER($1) ORDER BY name',
+        [`%${name}%`]
+      );
+      return result.rows;
+    },
     
     // Planet queries
-    planet: (_, { id }) => planets.find(p => p.id === id),
-    planets: () => planets,
+    planet: async (_, { id }) => {
+      const result = await db.query('SELECT * FROM planets WHERE id = $1', [id]);
+      return result.rows[0];
+    },
+    
+    planets: async () => {
+      const result = await db.query('SELECT * FROM planets ORDER BY id');
+      return result.rows;
+    },
     
     // Starship queries
-    starship: (_, { id }) => starships.find(s => s.id === id),
-    starships: () => starships,
+    starship: async (_, { id }) => {
+      const result = await db.query('SELECT * FROM starships WHERE id = $1', [id]);
+      return result.rows[0];
+    },
+    
+    starships: async () => {
+      const result = await db.query('SELECT * FROM starships ORDER BY id');
+      return result.rows;
+    },
     
     // Film queries
-    film: (_, { id }) => films.find(f => f.id === id),
-    films: () => films,
-    filmsByEpisode: () => [...films].sort((a, b) => a.episodeId - b.episodeId),
+    film: async (_, { id }) => {
+      const result = await db.query('SELECT *, episode_id as "episodeId" FROM films WHERE id = $1', [id]);
+      return result.rows[0];
+    },
+    
+    films: async () => {
+      const result = await db.query('SELECT *, episode_id as "episodeId" FROM films ORDER BY id');
+      return result.rows;
+    },
+    
+    filmsByEpisode: async () => {
+      const result = await db.query('SELECT *, episode_id as "episodeId" FROM films ORDER BY episode_id');
+      return result.rows;
+    },
   },
   
   Mutation: {
-    addCharacter: (_, { input }) => {
-      const newCharacter = {
-        id: String(characters.length + 1),
-        name: input.name,
-        height: input.height || null,
-        mass: input.mass || null,
-        homeworld: input.homeworldId || null,
-        starships: input.starshipIds || [],
-        films: input.filmIds || []
-      };
-      characters.push(newCharacter);
-      return newCharacter;
+    addCharacter: async (_, { input }) => {
+      const { name, height, mass, homeworldId, starshipIds, filmIds } = input;
+      
+      // Start a transaction
+      const client = await db.pool.connect();
+      try {
+        await client.query('BEGIN');
+        
+        // Insert character
+        const characterResult = await client.query(
+          `INSERT INTO characters (name, height, mass, homeworld_id) 
+           VALUES ($1, $2, $3, $4) RETURNING *`,
+          [name, height, mass, homeworldId]
+        );
+        const character = characterResult.rows[0];
+        
+        // Insert starship relationships
+        if (starshipIds && starshipIds.length > 0) {
+          for (const starshipId of starshipIds) {
+            await client.query(
+              'INSERT INTO character_starships (character_id, starship_id) VALUES ($1, $2)',
+              [character.id, starshipId]
+            );
+          }
+        }
+        
+        // Insert film relationships
+        if (filmIds && filmIds.length > 0) {
+          for (const filmId of filmIds) {
+            await client.query(
+              'INSERT INTO character_films (character_id, film_id) VALUES ($1, $2)',
+              [character.id, filmId]
+            );
+          }
+        }
+        
+        await client.query('COMMIT');
+        return character;
+      } catch (error) {
+        await client.query('ROLLBACK');
+        throw error;
+      } finally {
+        client.release();
+      }
     },
     
-    assignPilot: (_, { starshipId, characterId }) => {
-      const starship = starships.find(s => s.id === starshipId);
-      const character = characters.find(c => c.id === characterId);
+    assignPilot: async (_, { starshipId, characterId }) => {
+      // Verify both exist
+      const characterCheck = await db.query('SELECT id FROM characters WHERE id = $1', [characterId]);
+      const starshipCheck = await db.query('SELECT id FROM starships WHERE id = $1', [starshipId]);
       
-      if (!starship) throw new Error('Starship not found');
-      if (!character) throw new Error('Character not found');
+      if (!characterCheck.rows[0]) throw new Error('Character not found');
+      if (!starshipCheck.rows[0]) throw new Error('Starship not found');
       
-      if (!starship.pilots.includes(characterId)) {
-        starship.pilots.push(characterId);
-      }
+      // Insert relationship (ignore if already exists)
+      await db.query(
+        `INSERT INTO character_starships (character_id, starship_id) 
+         VALUES ($1, $2) 
+         ON CONFLICT (character_id, starship_id) DO NOTHING`,
+        [characterId, starshipId]
+      );
       
-      if (!character.starships.includes(starshipId)) {
-        character.starships.push(starshipId);
-      }
-      
-      return starship;
+      // Return the updated starship
+      const result = await db.query('SELECT * FROM starships WHERE id = $1', [starshipId]);
+      return result.rows[0];
     },
     
-    updatePlanetPopulation: (_, { planetId, population }) => {
-      const planet = planets.find(p => p.id === planetId);
-      if (!planet) throw new Error('Planet not found');
+    updatePlanetPopulation: async (_, { planetId, population }) => {
+      const result = await db.query(
+        'UPDATE planets SET population = $1 WHERE id = $2 RETURNING *',
+        [population, planetId]
+      );
       
-      planet.population = population;
-      return planet;
+      if (!result.rows[0]) throw new Error('Planet not found');
+      return result.rows[0];
     }
   },
   
   // Field resolvers for relationships
   Character: {
-    homeworld: (character) => {
-      if (!character.homeworld) return null;
-      return planets.find(p => p.id === character.homeworld);
+    homeworld: async (character) => {
+      if (!character.homeworld_id) return null;
+      const result = await db.query('SELECT * FROM planets WHERE id = $1', [character.homeworld_id]);
+      return result.rows[0];
     },
-    starships: (character) => {
-      return starships.filter(s => character.starships.includes(s.id));
+    
+    starships: async (character) => {
+      const result = await db.query(
+        `SELECT s.* FROM starships s
+         JOIN character_starships cs ON s.id = cs.starship_id
+         WHERE cs.character_id = $1
+         ORDER BY s.id`,
+        [character.id]
+      );
+      return result.rows;
     },
-    films: (character) => {
-      return films.filter(f => character.films.includes(f.id));
+    
+    films: async (character) => {
+      const result = await db.query(
+        `SELECT f.*, f.episode_id as "episodeId" FROM films f
+         JOIN character_films cf ON f.id = cf.film_id
+         WHERE cf.character_id = $1
+         ORDER BY f.episode_id`,
+        [character.id]
+      );
+      return result.rows;
     }
   },
   
   Planet: {
-    residents: (planet) => {
-      return characters.filter(c => planet.residents.includes(c.id));
+    residents: async (planet) => {
+      const result = await db.query(
+        'SELECT * FROM characters WHERE homeworld_id = $1 ORDER BY name',
+        [planet.id]
+      );
+      return result.rows;
     }
   },
   
   Starship: {
-    pilots: (starship) => {
-      return characters.filter(c => starship.pilots.includes(c.id));
+    pilots: async (starship) => {
+      const result = await db.query(
+        `SELECT c.* FROM characters c
+         JOIN character_starships cs ON c.id = cs.character_id
+         WHERE cs.starship_id = $1
+         ORDER BY c.name`,
+        [starship.id]
+      );
+      return result.rows;
     }
   },
   
   Film: {
-    characters: (film) => {
-      return characters.filter(c => film.characters.includes(c.id));
+    characters: async (film) => {
+      const result = await db.query(
+        `SELECT c.* FROM characters c
+         JOIN character_films cf ON c.id = cf.character_id
+         WHERE cf.film_id = $1
+         ORDER BY c.name`,
+        [film.id]
+      );
+      return result.rows;
     }
   }
 };
