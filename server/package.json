@@ -7,6 +7,7 @@
     "start": "node start-safe.js",
     "dev": "node start-safe.js",
     "start-unsafe": "node index.js",
+    "start-voyager": "node index-with-voyager.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -15,7 +16,10 @@
   "type": "commonjs",
   "dependencies": {
     "apollo-server": "^3.13.0",
+    "apollo-server-express": "^3.13.0",
+    "express": "^4.21.2",
     "graphql": "^16.11.0",
+    "graphql-voyager": "^2.1.0",
     "pg": "^8.16.3"
   }
 }

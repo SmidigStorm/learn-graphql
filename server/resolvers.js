@@ -43,6 +43,29 @@ const resolvers = {
       return result.rows;
     },
     
+    // Kill queries
+    kills: async (_, { method, location }) => {
+      let query = 'SELECT * FROM character_kills WHERE 1=1';
+      const params = [];
+      let paramCount = 0;
+      
+      if (method) {
+        paramCount++;
+        query += ` AND LOWER(method) = LOWER($${paramCount})`;
+        params.push(method);
+      }
+      
+      if (location) {
+        paramCount++;
+        query += ` AND LOWER(location) LIKE LOWER($${paramCount})`;
+        params.push(`%${location}%`);
+      }
+      
+      query += ' ORDER BY occurred_at DESC';
+      
+      const result = await db.query(query, params);
+      return result.rows;
+    },
   },
   
   Mutation: {
@@ -112,6 +135,36 @@ const resolvers = {
       
       if (!result.rows[0]) throw new Error('Planet not found');
       return result.rows[0];
+    },
+    
+    recordKill: async (_, { input }) => {
+      const { killerId, victimId, method, location, description, occurredAt } = input;
+      
+      // Validate killer and victim exist
+      const killerCheck = await db.query('SELECT id FROM characters WHERE id = $1', [killerId]);
+      const victimCheck = await db.query('SELECT id FROM characters WHERE id = $1', [victimId]);
+      
+      if (!killerCheck.rows[0]) throw new Error('Killer character not found');
+      if (!victimCheck.rows[0]) throw new Error('Victim character not found');
+      
+      // Database constraints will handle duplicate kills and self-kills
+      try {
+        const result = await db.query(
+          `INSERT INTO character_kills (killer_id, victim_id, method, location, description, occurred_at) 
+           VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`,
+          [killerId, victimId, method, location, description, occurredAt || new Date()]
+        );
+        
+        return result.rows[0];
+      } catch (error) {
+        if (error.constraint === 'no_suicide') {
+          throw new Error('A character cannot kill themselves');
+        }
+        if (error.constraint === 'character_kills_victim_id_key') {
+          throw new Error('This character has already been killed');
+        }
+        throw error;
+      }
     }
   },
   
@@ -134,6 +187,29 @@ const resolvers = {
       return result.rows;
     },
     
+    kills: async (character) => {
+      const result = await db.query(
+        'SELECT * FROM character_kills WHERE killer_id = $1 ORDER BY occurred_at DESC',
+        [character.id]
+      );
+      return result.rows;
+    },
+    
+    death: async (character) => {
+      const result = await db.query(
+        'SELECT * FROM character_kills WHERE victim_id = $1',
+        [character.id]
+      );
+      return result.rows[0] || null;
+    },
+    
+    killCount: async (character) => {
+      const result = await db.query(
+        'SELECT COUNT(*) as count FROM character_kills WHERE killer_id = $1',
+        [character.id]
+      );
+      return parseInt(result.rows[0].count);
+    },
   },
   
   Planet: {
@@ -159,6 +235,22 @@ const resolvers = {
     }
   },
   
+  Kill: {
+    killer: async (kill) => {
+      const result = await db.query('SELECT * FROM characters WHERE id = $1', [kill.killer_id]);
+      return result.rows[0];
+    },
+    
+    victim: async (kill) => {
+      const result = await db.query('SELECT * FROM characters WHERE id = $1', [kill.victim_id]);
+      return result.rows[0];
+    },
+    
+    occurredAt: async (kill) => {
+      // Format the timestamp as ISO string
+      return kill.occurred_at ? new Date(kill.occurred_at).toISOString() : null;
+    }
+  },
 };
 
 module.exports = resolvers;

@@ -97,3 +97,35 @@ INSERT INTO character_starships (character_id, starship_id) VALUES
 (4, 5), -- Han - Slave 1
 (1, 4); -- Luke - Millennium Falcon
 
+-- Add more characters for kill events
+INSERT INTO characters (name, height, mass, homeworld_id) VALUES
+('Obi-Wan Kenobi', 182, 77, 1),
+('Emperor Palpatine', 170, 75, NULL),
+('Boba Fett', 183, 78, NULL),
+('Jabba the Hutt', 175, 1358, 1),
+('Greedo', 173, 74, NULL),
+('Count Dooku', 193, 80, NULL),
+('Anakin Skywalker', 188, 84, 1),
+('Mace Windu', 188, 84, NULL),
+('Qui-Gon Jinn', 193, 89, NULL),
+('Darth Maul', 175, 80, NULL);
+
+-- Famous Star Wars kills
+INSERT INTO character_kills (killer_id, victim_id, method, location, description, occurred_at) VALUES
+-- Darth Vader kills Obi-Wan
+(2, 6, 'Lightsaber', 'Death Star I', 'Obi-Wan sacrifices himself during lightsaber duel, becoming one with the Force', '1977-05-25 12:00:00'),
+-- Darth Vader kills Emperor Palpatine
+(2, 7, 'Thrown down reactor shaft', 'Death Star II', 'Vader redeems himself by saving Luke and destroying the Emperor', '1983-05-25 14:00:00'),
+-- Han Solo kills Greedo
+(4, 10, 'Blaster', 'Mos Eisley Cantina', 'Han shoots first (or simultaneously) in cantina confrontation', '1977-05-25 10:00:00'),
+-- Leia kills Jabba
+(3, 9, 'Chain strangulation', 'Jabba''s Sail Barge', 'Leia strangles Jabba with her slave chain during the Sarlacc execution', '1983-05-25 11:00:00'),
+-- Anakin kills Count Dooku
+(12, 11, 'Dual lightsaber decapitation', 'The Invisible Hand', 'Anakin executes Dooku on Palpatine''s orders', '2005-05-19 09:00:00'),
+-- Anakin kills Mace Windu
+(12, 13, 'Lightsaber/Force Lightning', 'Chancellor''s Office', 'Anakin assists Palpatine, leading to Windu''s death', '2005-05-19 18:00:00'),
+-- Darth Maul kills Qui-Gon
+(15, 14, 'Lightsaber', 'Naboo Power Generator', 'Maul defeats Qui-Gon in intense duel', '1999-05-19 15:00:00'),
+-- Obi-Wan kills Darth Maul
+(6, 15, 'Lightsaber bisection', 'Naboo Power Generator', 'Obi-Wan avenges his master by cutting Maul in half', '1999-05-19 15:30:00');
+
